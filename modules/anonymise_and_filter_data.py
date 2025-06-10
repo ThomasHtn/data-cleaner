@@ -1,14 +1,14 @@
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import missingno as msno
 
 from utils.outliers import outliners_filter
 
 # Load CSV
-df = pd.read_csv("data/data.csv")
+df = pd.read_csv("data/data_not_RGPD.csv")
 
-
-############### FILTER AND REPLACE VALUE #############
+############### SELECT & ANONYMISE DATASET #############
 
 # Keep columns and remove :
 # - historique_credit, ~ 50% of na value
@@ -17,30 +17,37 @@ df = df[[
     'age', 
     'taille', 
     'poids', 
+    'sexe',
+    'sport_licence',
+    'niveau_etude',
+    'region',
+    'smoker',
+    'nationalité_francaise',
     'revenu_estime_mois', 
+    'situation_familiale',
     'risque_personnel',
     'loyer_mensuel',
     'montant_pret',
 ]]
 
 # Replace "na" (empty) by mean
-df.fillna({'revenu_estime_mois': df['revenu_estime_mois'].mean()}, inplace=True)
-df.fillna({'age': df['age'].mean()}, inplace=True)
-df.fillna({'taille': df['taille'].mean()}, inplace=True)
-df.fillna({'risque_personnel': df['risque_personnel'].mean()}, inplace=True)
+df.fillna({'situation_familiale': df['situation_familiale'].mode()}, inplace=True)
 df.fillna({'loyer_mensuel': df['loyer_mensuel'].mean()}, inplace=True)
-df.fillna({'montant_pret': df['montant_pret'].mean()}, inplace=True)
 
 
-df = df.dropna() # Remove missing row value from other columns
-df = df.drop_duplicates() # Remove duplicated row
+# Transform category to numeric 
 
-df = df[df['age'] <= 80] # Cannot get loan after this age
-df = df[df['age'] >= 18] # must be adult
+df = pd.get_dummies(df, columns=["sexe"])
+df = pd.get_dummies(df, columns=["sport_licence"])
+df = pd.get_dummies(df, columns=["niveau_etude"])
+df = pd.get_dummies(df, columns=["region"])
+df = pd.get_dummies(df, columns=["smoker"])
+df = pd.get_dummies(df, columns=["nationalité_francaise"])
+df = pd.get_dummies(df, columns=["situation_familiale"])
+
 
 # display result
-print(df.describe)
-
+print(df.head())
 
 ############### DETECT DATA ERROR (Boxplot) ###############
 print("BOXPLOT : revenu_estime_mois")
@@ -104,7 +111,6 @@ plt.show()
 
 
 df = df.drop_duplicates() # Remove duplicated row
-print(df.describe)
 
 ############### SEABORN ###############
 sns.set_theme(style="darkgrid")
@@ -118,6 +124,5 @@ sns.histplot(df['montant_pret'], kde=True)
 plt.legend() 
 plt.show()
 
-
 ### SAVE FILTERED CSV
-df.to_csv('data/out.csv', index=False)  
+df.to_csv('data/data_RGPD.csv', index=False)  
