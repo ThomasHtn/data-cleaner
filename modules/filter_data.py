@@ -109,12 +109,15 @@ print(df.describe)
 
 ############### SEABORN ###############
 sns.set_theme(style="darkgrid")
-
 sns.histplot(df['revenu_estime_mois'], kde=True)
-
 plt.legend() 
 plt.show()
 
+
+sns.set_theme(style="darkgrid")
+sns.histplot(df['montant_pret'], kde=True)
+plt.legend() 
+plt.show()
 
 
 ### SAVE FILTERED CSV

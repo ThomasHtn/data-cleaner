@@ -1,7 +1,3 @@
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-
 def outliners_filter(df, col: str):
     Q1 = df[col].quantile(0.25)
     Q3 = df[col].quantile(0.75)
